@@ -1,1 +1,6 @@
-console.log('salauddin');
+
+$(document).ready(function(){
+   alert('ki');
+  });
+
+  alert('hi');

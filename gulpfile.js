@@ -7,6 +7,7 @@ const cleanCSS = require('gulp-clean-css');
 const autoprefixer = require('gulp-autoprefixer');
 const sourcemaps = require('gulp-sourcemaps');
 const browserSync = require('browser-sync').create();
+const webpack = require('webpack-stream');
 
 
 const PRODUCTION = yarg.argv.prod;
@@ -19,6 +20,10 @@ const paths = {
     html: {
         src: 'src/**/*.html',
         dest: 'dist'
+    },
+    script: {
+        src: 'src/assest/js/**/*.js',
+        dest: 'dist/assest/js'
     },
     font: {
         src: 'node_modules/@fortawesome/fontawesome-free/webfonts/**',
@@ -42,24 +47,22 @@ const paths = {
             'node_modules/jquery/dist/jquery.min.js',
             'node_modules/bootstrap/dist/js/bootstrap.min.js',
             'node_modules/owl.carousel/dist/owl.carousel.min.js',
+            'node_modules/wow.js/dist/wow.min.js',
         ],
         dest: 'dist/assest/js'
     },
     images: {
         src: '',
         dest: ''
-    },
-    script: {
-        src: 'src/assest/js/**/*.js',
-        dest: 'dist/assest/js'
     }
 }
 
 const clean = () => del('dist');
 
-const font = () => {
-    return src(paths.font.src)
-        .pipe(dest(paths.font.dest));
+
+const html = () => {
+    return src(paths.html.src)
+        .pipe(dest(paths.html.dest));
 }
 
 const style = () => {
@@ -75,6 +78,32 @@ const style = () => {
         .pipe(browserSync.stream());
 }
 
+const script = () => {
+    return src(paths.script.src)
+        .pipe(webpack({
+            module: {
+                rules: [
+                  {
+                    test: /\.js$/,
+                    exclude: /(node_modules|bower_components)/,
+                    use: {
+                      loader: 'babel-loader',
+                      options: {
+                        presets: ['@babel/preset-env']
+                      }
+                    }
+                  }
+                ]
+              },
+              output: {
+                filename: 'bundle.js',
+              },
+              mode: 'development'
+        }))
+        .pipe(dest(paths.script.dest))
+        .pipe(browserSync.stream());
+}
+
 const pluginCss = () => {
     return src(paths.pluginCss.src)
         .pipe(dest(paths.pluginCss.dest));
@@ -85,19 +114,14 @@ const pluginJs = () => {
         .pipe(dest(paths.pluginJs.dest));
 }
 
+const font = () => {
+    return src(paths.font.src)
+        .pipe(dest(paths.font.dest));
+}
+
 const fontawesomeCss = () => {
     return src(paths.fontawesomeCss.src)
         .pipe(dest(paths.fontawesomeCss.dest));
-}
-
-const html = () => {
-    return src(paths.html.src)
-        .pipe(dest(paths.html.dest));
-}
-
-const script = () => {
-    return src(paths.script.src)
-        .pipe(dest(paths.script.dest));
 }
 
 const watchs = () => {
@@ -108,6 +132,7 @@ const watchs = () => {
     });
     watch('src/assest/scss/**/*.scss', style);
     watch('src/**/*.html', html).on('change', browserSync.reload);
+    watch('src/assest/js/**/*.js', script);
 }
 
 exports.default =  series(clean, parallel(style, html, script, font, fontawesomeCss, pluginCss, pluginJs), watchs);

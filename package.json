@@ -17,6 +17,10 @@
   },
   "homepage": "https://github.com/salauddin893/apo#readme",
   "devDependencies": {
+    "@babel/core": "^7.7.7",
+    "@babel/preset-env": "^7.7.7",
+    "@babel/register": "^7.7.7",
+    "babel-loader": "^8.0.0-beta.0",
     "browser-sync": "^2.26.7",
     "del": "^5.1.0",
     "gulp": "^4.0.2",
@@ -27,6 +31,7 @@
     "gulp-sourcemaps": "^2.6.5",
     "gulp-uglifycss": "^1.1.0",
     "node-sass": "^4.13.0",
+    "webpack-stream": "^5.2.1",
     "yargs": "^15.0.2"
   },
   "dependencies": {
